@@ -1,0 +1,43 @@
+name: Release Images
+on:
+  push:
+    tags:
+      - "*-dkoshkin.*"
+
+# Because variables are not exported, they are not visible by child processes, e.g. make
+env:
+  registry: ghcr.io/dkoshkin
+
+jobs:
+  release-controller-image:
+    name: Release Controller Image
+    runs-on:
+      - ubuntu-22.04
+    steps:
+      - uses: actions/checkout@v3
+      - name: Login to container registry
+        uses: docker/login-action@v2
+        with:
+          registry: ${{ env.registry }}
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+      - name: Build and push container image
+        env:
+          IMAGE: ${{ env.registry }}/metallb/controller:${{ github.ref_name }}
+        run: docker buildx build -t ${{ env.IMAGE }} --push controller/
+  release-speaker-image:
+    name: Release Speaker Image
+    runs-on:
+      - ubuntu-22.04
+    steps:
+      - uses: actions/checkout@v3
+      - name: Login to container registry
+        uses: docker/login-action@v2
+        with:
+          registry: ${{ env.registry }}
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+      - name: Build and push container image
+        env:
+          IMAGE: ${{ env.registry }}/metallb/speaker:${{ github.ref_name }}
+        run: docker buildx build -t ${{ env.IMAGE }} --push speaker/

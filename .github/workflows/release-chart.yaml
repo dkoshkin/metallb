@@ -1,10 +1,5 @@
 name: Release Charts
 
-on:
-  push:
-    tags:
-      - v*
-
 jobs:
   release:
     runs-on: ubuntu-latest
